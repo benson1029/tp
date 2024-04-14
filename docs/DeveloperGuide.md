@@ -17,6 +17,8 @@ This project is based on the AddressBook-Level3 project created by the [SE-EDU i
 
 --------------------------------------------------------------------------------------------------------------------
 
+<div style="page-break-after: always;"></div>
+
 ## **Setting up, getting started**
 
 Refer to the guide [_Setting up and getting started_](SettingUp.md).
@@ -48,6 +50,8 @@ The bulk of the app's work is done by the following four components:
 
 [**`Commons`**](#common-classes) represents a collection of classes used by multiple other components.
 
+<div style="page-break-after: always;"></div>
+
 **How the architecture components interact with each other**
 
 The *Sequence Diagram* below shows how the components interact with each other for the scenario where the user issues the command `delete #1`.
@@ -64,6 +68,8 @@ For example, the `Logic` component defines its API in the `Logic.java` interface
 <puml src="diagrams/ComponentManagers.puml" width="300" />
 
 The sections below give more details of each component.
+
+<div style="page-break-after: always;"></div>
 
 ### UI component
 
@@ -83,13 +89,16 @@ The `UI` component,
 * depends on some classes in the `Model` component, as it displays `CourseMate` and `Group` objects residing in the `Model`.
 * maintains the command history (in the `CommandHistory` class) and provides the command history to the user when requested.
 
+<div style="page-break-after: always;"></div>
+
 ### Logic component
 
 **API** : [`Logic.java`](https://github.com/AY2324S2-CS2103T-F13-3/tp/tree/master/src/main/java/seedu/address/logic/Logic.java)
 
-Here's a (partial) class diagram of the `Logic` component:
-
+Here's a (partial) class diagram of the `Logic` component:  
 <puml src="diagrams/LogicClassDiagram.puml" width="550"/>
+
+<div style="page-break-after: always;"></div>
 
 The sequence diagram below illustrates the interactions within the `Logic` component, taking `execute("delete #1")` API call as an example.
 
@@ -108,6 +117,8 @@ How the `Logic` component works:
    Note that although this is shown as a single step in the diagram above (for simplicity), in the code it can take several interactions (between the command object and the `Model`) to achieve.
 1. The result of the command execution is encapsulated as a `CommandResult` object which is returned back from `Logic`.
 
+<div style="page-break-after: always;"></div>
+
 Here are the other classes in `Logic` (omitted from the class diagram above) that are used for parsing a user command:
 
 <puml src="diagrams/ParserClasses.puml" width="600"/>
@@ -120,6 +131,8 @@ Here are the other classes in `Logic` (omitted from the class diagram above) tha
 How the parsing works:
 * When called upon to parse a user command, the `MatchMateParser` class creates an `XYZCommandParser` (`XYZ` is a placeholder for the specific command name e.g., `AddCommandParser`) which uses the other classes shown above to parse the user command and create a `XYZCommand` object (e.g., `AddCommand`) which the `MatchMateParser` returns back as a `Command` object.
 * All `XYZCommandParser` classes (e.g., `AddCommandParser`, `DeleteCommandParser`, ...) inherit from the `Parser` interface so that they can be treated similarly where possible e.g, during testing.
+
+<div style="page-break-after: always;"></div>
 
 ### Model component
 **API** : [`Model.java`](https://github.com/AY2324S2-CS2103T-F13-3/tp/tree/master/src/main/java/seedu/address/model/Model.java)
@@ -136,6 +149,7 @@ The `Model` component,
 * stores a `UserPref` object that represents the user’s preferences. This is exposed to the outside as a `ReadOnlyUserPref` objects.
 * does not depend on any of the other three components (as the `Model` represents data entities of the domain, they should make sense on their own without depending on other components)
 
+<div style="page-break-after: always;"></div>
 
 ### Storage component
 
@@ -153,6 +167,8 @@ The `Storage` component,
 Classes used by multiple components are in the `seedu.address.commons` package.
 
 --------------------------------------------------------------------------------------------------------------------
+
+<div style="page-break-after: always;"></div>
 
 ## **Implementation**
 
@@ -179,6 +195,8 @@ The following shows the sequence diagrams of how the UI component loads the cour
     <puml src="diagrams/ProcessedCourseMateSequenceDiagram.puml" alt="ProcessedCourseMateSequenceDiagram" />
 
     The `CommandResult` object returned by the `Logic` component contains a flag that indicates if the command involves one processed courseMate. If so, `CourseMateDetailPanel` is updated with the processed courseMate.
+
+<div style="page-break-after: always;"></div>
 
 Two types of selection in the courseMate list panel are supported: double click and pressing the enter key. This requires two different event handlers to be implemented in the `CourseMateListPanel` class as shown below. These event handlers are instantiated and set as the event handlers for the `ListView` object in the constructor of `CourseMateListPanel`.
 
@@ -780,14 +798,15 @@ Team size: 5
 
 2. **Improved filtering when adding or removing members in a group with similar names**: When trying to add or remove a member from a group using a substring of the member's name, the app currently lists all courseMates with the substring in their name, regardless of whether they are already in the group. This causes the user having to re-try the command using the hashtag notation unnecessarily. We plan to enhance this filtering by excluding members that are already in the group for the `add-member` command, and excluding members that are not in the group for the `remove-member` command.
 
-3. **Provide warnings for `require-skill` and `unrequire-skill` when skill is already required / unrequired**: Currently, the app does not provide any feedback when a user tries to require a skill that is already required, or unrequire a skill that is already unrequired. We plan to provide a warning message in such cases to inform the user that the command has no effect, and suggest the user to check for typos.
+3. **Provide warnings for `require-skill` when skill is already required**: Currently, the app does not provide any feedback when a user tries to require a skill that is already required. We plan to provide a warning message in such cases to inform the user that the command has no effect, and suggest the user to check for typos.
 
-4. **Provide warnings for `mark-important` and `unmark-important` when skill is already marked / unmarked as important**: Currently, the app does not provide any feedback when a user tries to mark a skill as important that is already marked as important, or unmark a skill that is already unmarked. We plan to provide a warning message in such cases to inform the user that the command has no effect, and suggest the user to check for typos.
+4. **Display error messages for `unrequire-skill` when skill is not yet required**: Currently, if the user tries to unrequire a skill that is not yet required, the app only shows a warning message and proceeds to unrequire the other skills supplied. This is inconsistent with the behaviour of the commands `mark-important` and `unmark-important`. We plan to reject the entire command if the user tries to unrequire a skill that is not yet required, and show an error message to inform the user that one or more of the skills are not yet required.
 
-5. **Provide warnings for `add-skill` and `delete-skill` when skill is already added / deleted**: Currently, the app does not provide any feedback when a user tries to add a skill that is already added, or delete a skill that is already deleted. We plan to provide a warning message in such cases to inform the user that the command has no effect, and suggest the user to check for typos.
+5. **Provide warnings for `mark-important` and `unmark-important` when skill is already marked / unmarked as important**: Currently, the app does not provide any feedback when a user tries to mark a skill as important that is already marked as important, or unmark a skill that is already unmarked. We plan to provide a warning message in such cases to inform the user that the command has no effect, and suggest the user to check for typos.
 
-6. **Allow case-insensitive command names**: Currently, the app only recognizes command names in lowercase. We plan to allow users to enter the command names in any case (e.g. `Add`, `aDd`, `ADD`), and the app will recognize them as the same command.
+6. **Provide warnings for `add-skill` and `delete-skill` when skill is already added / deleted**: Currently, the app does not provide any feedback when a user tries to add a skill that is already added, or delete a skill that is already deleted. We plan to provide a warning message in such cases to inform the user that the command has no effect, and suggest the user to check for typos.
 
+7. **Allow case-insensitive command names**: Currently, the app only recognizes command names in lowercase. We plan to allow users to enter the command names in any case (e.g. `Add`, `aDd`, `ADD`), and the app will recognize them as the same command.
 
 
 --------------------------------------------------------------------------------------------------------------------
@@ -848,6 +867,10 @@ Expected: Edits Benson's name to Benson CS. Edit utilizes substring search, and 
 1. Test case: `add-skill Ivan Tan -s C++`<br>
 Expected: Adds C++ skill to Ivan Tan
 
+1. Test case: `add-skill Ivan Tan -s React`<br>
+Expected: Adds React skill to Ivan Tan, and also gives a warning that if one or more skils added have not been previously added to other courseMates.
+This error message serves to warn for any potential typos when adding skills
+
 1. Test case: `add-skill Benson CS -s JS -s SQL`<br>
 Expected: Adds JS and SQL skills to Benson, and also gives a warning that if one or more skils added have not been previously added to other courseMates.
 This error message serves to warn for any potential typos when adding skills
@@ -883,7 +906,7 @@ Expected: Finds all courseMates whose names/skills contain C++
 1. Test case: `delete #0` <br>
    Expected: No courseMate is deleted. Error details shown in the status message.
 
-1. Other incorrect delete commands to try: `delete`, `delete x`, `...` (where x is larger than the list size)<br>
+1. Other incorrect delete commands to try: `delete`, `delete #x` (where x is larger than the list size), ...<br>
    Expected: Similar to previous.
 
 ### Rate a courseMate
@@ -946,7 +969,7 @@ Expected: Adds a new required skill for ES2660. Also gives a warning as Presenta
 Expected: Removes Presentation skill from ES2660
 
 3. Test case: `unrequire-skill CS project -s Java` <br>
-   Expected: The command fails as Java is not a required skill in CS project. Relevant error message is displayed
+   Expected: Java is not a required skill in CS project. The command does nothing and a relevant warning message is displayed
 
 
 ### Mark important skills in a group
